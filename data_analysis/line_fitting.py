@@ -16,7 +16,7 @@ cube = np.nan_to_num(cube)
 with fits.open(file) as hdulist:  # specify file name here
     hdu = hdulist[3];               # specify HDU index here
     av_constant_noise_level, sigma = spice_error(hdu, verbose=True)
-    sigma = sigma['Total'][0,:,110:750,:].value/10
+    sigma = sigma['Total'][0,:,115:730,:].value/10
 
 #Get the array of wavelengths
 waves = wavelengths
@@ -27,9 +27,14 @@ def substract_min_cube(cube):
         for i in range(0,cube.shape[2]): 
             cube[:,:,i] -= det_plane_min
         return cube
+def bindown(d,n):
+    inds = np.ravel_multi_index(np.floor((np.indices(d.shape).T*n/np.array(d.shape))).T.astype(np.uint32),n)
+    return np.bincount(inds.flatten(),weights=d.flatten(),minlength=np.prod(n)).reshape(n)   
 
 #Apply the function
 cube_sub = substract_min_cube(cube)
+sigma = bindown(sigma,np.round(np.array(sigma.shape)/np.array([1,2,1])).astype(np.int32)) 
+cube_sub = bindown(cube,np.round(np.array(cube.shape)/np.array([1,2,1])).astype(np.int32))
 
 
 [nx, ny] = cube_sub.shape[1:3]

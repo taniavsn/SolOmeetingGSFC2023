@@ -63,3 +63,8 @@ for i in tqdm.tqdm(range(0,nx)):
         cen1[i][j] = dopp1  - g_fit.mean_0.value
         rss[i][j] = np.abs(np.mean(g_fit.meta['fit_info']['fvec']))
         nbrIterConv[i][j] = g_fit.meta['fit_info']['nfev']
+
+# Store the result
+with open('your_path\\radiance_NeVIII.json', 'wb') as fstd:
+    pickle.dump(amps1, fstd)
+    
